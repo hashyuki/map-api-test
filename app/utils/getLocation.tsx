@@ -1,5 +1,3 @@
-"use client";
-
 export const getLocation = (): Promise<{ latitude: number, longitude: number }> => {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {

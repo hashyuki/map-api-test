@@ -31,6 +31,36 @@ const Home = () => {
                 });
 
                 console.log("Map initialized");
+
+                let marker = new google.maps.Marker({
+                    position: { lat: latitude, lng: longitude },
+                    map: map,
+                    draggable: true
+                });
+
+                google.maps.event.addListener(marker, 'dragend', function (event) {
+                    console.log("Marker dragged to:", event.latLng.lat(), event.latLng.lng());
+                });
+
+                google.maps.event.addListener(marker, 'click', function (event) {
+                    marker.setMap(null);
+                });
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    const newMarker = new google.maps.Marker({
+                        position: event.latLng,
+                        map: map,
+                        draggable: true
+                    });
+
+                    google.maps.event.addListener(newMarker, 'dragend', function (event) {
+                        console.log("New marker dragged to:", event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    google.maps.event.addListener(newMarker, 'click', function (event) {
+                        newMarker.setMap(null);
+                    });
+                });
             } catch (error) {
                 console.error("Error:", error);
                 alert("位置情報を取得できませんでした。");
