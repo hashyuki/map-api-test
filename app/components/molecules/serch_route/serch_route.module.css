@@ -1,0 +1,11 @@
+.VStack {
+    display: flex;
+    flex-direction: column;
+    width: 100%; 
+}
+
+.HStack {
+    display: flex;
+    flex-direction: row;
+    width:100%; 
+}

@@ -26,23 +26,22 @@
 }
 
 .category {
-    color: black;
     display: flex;
+    padding: 20px;
     font-size: 1em;
+    color: #00b5ad;
+    border: 1px #00b5ad solid;
     border-radius: 32px;
     justify-content: center;
     align-items: center;
-    text-align: center;
     background-color: #efefef;
-    cursor: pointer;
     max-width: 600px;
     width: 120px;
     height: 120px;
-    padding: 20px;
-    transition: background-color 0.3s ease;
-    font-weight: 500;
+    transition: 0.4s ease;
 }
 
 .category:hover {
-    background-color: #e3e3eb;
+    color: #fff;
+    background: #00b5ad;
 }

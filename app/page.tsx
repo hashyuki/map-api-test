@@ -5,7 +5,6 @@ import styles from "./page.module.css";
 
 const Home = () => {
     const categories = {
-        "Google Map API": "google-map",
         "MapBox API": "mapbox",
     };
 
