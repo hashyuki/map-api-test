@@ -16,6 +16,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
     const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
     const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
+    // initialize a map
     useEffect(() => {
         mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
         const initializeMap = (location: [number, number]) => {
@@ -58,6 +59,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         };
     }, [zoom, onLocationChange]);
 
+    // add a distination marker
     useEffect(() => {
         if (destination && mapRef.current) {
             if (!destinationMarkerRef.current) {
@@ -71,6 +73,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         }
     }, [destination]);
 
+    // add a route
     useEffect(() => {
         if (route && mapRef.current) {
             if (mapRef.current.getSource('route')) {
