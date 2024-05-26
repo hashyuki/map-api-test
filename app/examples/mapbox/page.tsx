@@ -18,7 +18,7 @@ const Home = () => {
     const handleSearch = async (query) => {
         if (!query) return;
         try {
-            const response = await fetch(`/api/maps/search_place?query=${encodeURIComponent(query)}`)
+            const response = await fetch(`/api/maps/search_place?query=${encodeURIComponent(query)}`);
             const lngLat = await response.json();
             setDestination(lngLat);
         } catch (error) {
