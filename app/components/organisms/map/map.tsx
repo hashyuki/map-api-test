@@ -69,8 +69,12 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
             userMarkerRef.current.setLngLat(newLocation);
             mapRef.current.flyTo({ center: newLocation });
             onLocationChange?.(newLocation);
-        }, () => {
+        }, error => {
             console.error('Failed to retrieve your location.');
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000
         });
 
         return () => {
