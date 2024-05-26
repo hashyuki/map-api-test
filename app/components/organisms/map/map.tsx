@@ -43,12 +43,12 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         navigator.geolocation.getCurrentPosition(
             position => {
                 const { latitude, longitude } = position.coords;
-                const location = [longitude, latitude] as [number, number];
-                onLocationChange?.(location);
-                initializeMap(location);
+                const initialLocation = [longitude, latitude] as [number, number];
+                onLocationChange?.(initialLocation);
+                initializeMap(initialLocation);
             },
             () => {
-                const defaultLocation = [139.6917, 35.6895] as [number, number];; // Tokyo
+                const defaultLocation = [139.6917, 35.6895] as [number, number]; // Tokyo
                 onLocationChange?.(defaultLocation);
                 initializeMap(defaultLocation);
             }
@@ -59,7 +59,26 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         };
     }, [zoom, onLocationChange]);
 
-    // add a distination marker
+    // monitor user's position and update marker
+    useEffect(() => {
+        if (!mapRef.current || !userMarkerRef.current) return;
+
+        const id = navigator.geolocation.watchPosition(position => {
+            const { latitude, longitude } = position.coords;
+            const newLocation = [longitude, latitude] as [number, number];
+            userMarkerRef.current.setLngLat(newLocation);
+            mapRef.current.flyTo({ center: newLocation });
+            onLocationChange?.(newLocation);
+        }, () => {
+            console.error('Failed to retrieve your location.');
+        });
+
+        return () => {
+            navigator.geolocation.clearWatch(id);
+        };
+    }, [mapRef.current, userMarkerRef.current, onLocationChange]);
+
+    // add a destination marker
     useEffect(() => {
         if (destination && mapRef.current) {
             if (!destinationMarkerRef.current) {
