@@ -76,13 +76,12 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
     // add a route
     useEffect(() => {
         if (route && mapRef.current) {
-            if (mapRef.current.getSource('route')) {
-                mapRef.current.getSource('route').setData(route);
-            } else {
+            if (!mapRef.current.getSource('route')) {
                 mapRef.current.addSource('route', {
                     type: 'geojson',
                     data: route.geometry
                 });
+                mapRef.current.getSource('route').setData(route);
                 mapRef.current.addLayer({
                     id: 'route',
                     type: 'line',
@@ -96,6 +95,8 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
                         'line-width': 8
                     }
                 });
+            } else {
+                mapRef.current.getSource('route').setData(route);
             }
         }
     }, [route]);

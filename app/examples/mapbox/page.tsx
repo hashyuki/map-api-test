@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { searchPlaces, getRoute } from "../../api/maps/route";
 
 import SearchPlace from '../../components/molecules/serch_place/serch_place';
 import SearchCoordinates from '../../components/molecules/serch_coordinates/serch_coordinates';
@@ -19,7 +18,8 @@ const Home = () => {
     const handleSearch = async (query) => {
         if (!query) return;
         try {
-            const lngLat = await searchPlaces(query);
+            const response = await fetch(`/api/maps/search_place?query=${encodeURIComponent(query)}`)
+            const lngLat = await response.json();
             setDestination(lngLat);
         } catch (error) {
             console.error("Error searching places:", error);
@@ -33,7 +33,8 @@ const Home = () => {
     const handleRouteSearch = async () => {
         if (!destination || !userLocation) return;
         try {
-            const routeData = await getRoute(userLocation, destination);
+            const response = await fetch(`/api/maps/search_route?start=${userLocation.join(',')}&end=${destination.join(',')}`);
+            const routeData = await response.json();
             setRoute(routeData);
         } catch (error) {
             console.error("Error fetching route:", error);
