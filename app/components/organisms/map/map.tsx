@@ -75,6 +75,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
                     type: 'Feature',
                     properties: {
                         description: `<strong>${landmark.name}</strong><p>${landmark.description}</p>`,
+                        genre: landmark.genre
                     },
                     geometry: {
                         type: 'Point',
@@ -84,47 +85,53 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
             };
 
             if (!mapRef.current?.getSource('places')) {
-              mapRef.current?.addSource('places', {
-                  type: 'geojson',
-                  data: geojsonData
-              });
+                mapRef.current?.addSource('places', {
+                    type: 'geojson',
+                    data: geojsonData
+                });
 
-              mapRef.current?.addLayer({
-                  id: 'places',
-                  type: 'circle',
-                  source: 'places',
-                  paint: {
-                      'circle-color': '#ffa417',
-                      'circle-radius': 6,
-                      'circle-stroke-width': 2,
-                      'circle-stroke-color': '#ffffff'
-                  }
-              });
+                mapRef.current?.addLayer({
+                    id: 'places',
+                    type: 'circle',
+                    source: 'places',
+                    paint: {
+                        'circle-color': [
+                            'match',
+                            ['get', 'genre'],
+                            'sightseeing', '#008000',
+                            'restaurant', '#ff8c00',
+                            '#000000'
+                        ],
+                        'circle-radius': 6,
+                        'circle-stroke-width': 2,
+                        'circle-stroke-color': '#ffffff'
+                    }
+                });
 
-              mapRef.current?.on('click', 'places', (e) => {
-                  const coordinates = e.features[0].geometry.coordinates.slice();
-                  const description = e.features[0].properties.description;
+                mapRef.current?.on('click', 'places', (e) => {
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const description = e.features[0].properties.description;
 
-                  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                  }
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
 
-                  new mapboxgl.Popup()
-                      .setLngLat(coordinates)
-                      .setHTML(description)
-                      .addTo(mapRef.current!);
-              });
+                    new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML(description)
+                        .addTo(mapRef.current!);
+                });
 
-              mapRef.current?.on('mouseenter', 'places', () => {
-                  mapRef.current!.getCanvas().style.cursor = 'pointer';
-              });
+                mapRef.current?.on('mouseenter', 'places', () => {
+                    mapRef.current!.getCanvas().style.cursor = 'pointer';
+                });
 
-              mapRef.current?.on('mouseleave', 'places', () => {
-                  mapRef.current!.getCanvas().style.cursor = '';
-              });
-          }
-      }
-  };
+                mapRef.current?.on('mouseleave', 'places', () => {
+                    mapRef.current!.getCanvas().style.cursor = '';
+                });
+            }
+        }
+    };
 
     // add a destination marker
     useEffect(() => {
