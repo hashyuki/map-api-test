@@ -15,8 +15,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
-    // initialize a map
-    useEffect(() => {
+    const initializeMap = () => {
         mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY!;
         const map = new mapboxgl.Map({
             container: mapContainerRef.current!,
@@ -48,23 +47,21 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
             fetchGeoJsonData();
         });
 
-        return () => {
-            mapRef.current?.remove();
-        };
-    }, [zoom, onLocationChange]);
+        return map;
+    };
 
     const fetchGeoJsonData = async () => {
         try {
             const response = await fetch('/api/db/get_landmarks');
             const geojsonData = await response.json();
 
-            if (!mapRef.current?.getSource('places')) {
-                mapRef.current?.addSource('places', {
+            if (mapRef.current && !mapRef.current.getSource('places')) {
+                mapRef.current.addSource('places', {
                     type: 'geojson',
                     data: geojsonData
                 });
 
-                mapRef.current?.addLayer({
+                mapRef.current.addLayer({
                     id: 'places',
                     type: 'circle',
                     source: 'places',
@@ -82,7 +79,7 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
                     }
                 });
 
-                mapRef.current?.on('click', 'places', (e) => {
+                mapRef.current.on('click', 'places', (e) => {
                     const coordinates = e.features[0].geometry.coordinates.slice();
                     const description = e.features[0].properties.description;
 
@@ -96,11 +93,11 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
                         .addTo(mapRef.current!);
                 });
 
-                mapRef.current?.on('mouseenter', 'places', () => {
+                mapRef.current.on('mouseenter', 'places', () => {
                     mapRef.current!.getCanvas().style.cursor = 'pointer';
                 });
 
-                mapRef.current?.on('mouseleave', 'places', () => {
+                mapRef.current.on('mouseleave', 'places', () => {
                     mapRef.current!.getCanvas().style.cursor = '';
                 });
             }
@@ -109,7 +106,14 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         }
     };
 
-    // add a destination marker
+    useEffect(() => {
+        const map = initializeMap();
+
+        return () => {
+            map.remove();
+        };
+    }, [zoom, onLocationChange]);
+
     useEffect(() => {
         if (destination && mapRef.current) {
             if (!destinationMarkerRef.current) {
@@ -123,7 +127,6 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
         }
     }, [destination]);
 
-    // add a route
     useEffect(() => {
         if (route && mapRef.current) {
             if (!mapRef.current.getSource('route')) {
