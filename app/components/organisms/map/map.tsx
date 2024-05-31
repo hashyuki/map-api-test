@@ -2,11 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import styles from './map.module.css';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface Props {
     zoom?: number;
@@ -59,30 +54,9 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
     }, [zoom, onLocationChange]);
 
     const fetchGeoJsonData = async () => {
-        const { data, error } = await supabase
-            .from('landmark')
-            .select('*');
-
-        if (error) {
-            console.error('Error fetching data:', error);
-            return;
-        }
-
-        if (data) {
-            const geojsonData = {
-                type: 'FeatureCollection',
-                features: data.map((landmark: any) => ({
-                    type: 'Feature',
-                    properties: {
-                        description: `<strong>${landmark.name}</strong><p>${landmark.description}</p>`,
-                        genre: landmark.genre
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [landmark.longitude, landmark.latitude]
-                    }
-                }))
-            };
+        try {
+            const response = await fetch('/api/db/get_landmarks');
+            const geojsonData = await response.json();
 
             if (!mapRef.current?.getSource('places')) {
                 mapRef.current?.addSource('places', {
@@ -130,6 +104,8 @@ const Map: React.FC<Props> = ({ zoom = 12, onLocationChange, destination, route 
                     mapRef.current!.getCanvas().style.cursor = '';
                 });
             }
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
     };
 
