@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 
+export const runtime = 'edge';
 export async function GET(req: NextRequest) {
     const start = req.nextUrl.searchParams.get('start');
     const end = req.nextUrl.searchParams.get('end');
